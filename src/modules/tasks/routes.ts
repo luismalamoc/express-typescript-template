@@ -1,0 +1,179 @@
+import { Router } from 'express';
+import { 
+  getAllTasksHandler, 
+  getTaskByIdHandler, 
+  createTaskHandler,
+  updateTaskHandler,
+  deleteTaskHandler
+} from './controllers/task.controller';
+import { authenticate } from '../../middlewares/auth.middleware';
+import { validateTask } from './schemas/task.schema';
+
+// Create router
+const router = Router();
+
+/**
+ * @swagger
+ * /tasks:
+ *   get:
+ *     summary: Get all tasks
+ *     description: Retrieves all tasks, can be filtered by userId
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: Filter tasks by user ID
+ *     responses:
+ *       200:
+ *         description: Tasks retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get('/', authenticate, getAllTasksHandler);
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   get:
+ *     summary: Get a task by ID
+ *     description: Retrieves a specific task by its ID
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     responses:
+ *       200:
+ *         description: Task retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id', authenticate, getTaskByIdHandler);
+
+/**
+ * @swagger
+ * /tasks:
+ *   post:
+ *     summary: Create a new task
+ *     description: Creates a new task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [pending, in-progress, completed]
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Task created successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.post('/', authenticate, validateTask, createTaskHandler);
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   put:
+ *     summary: Update a task
+ *     description: Updates an existing task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [pending, in-progress, completed]
+ *     responses:
+ *       200:
+ *         description: Task updated successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/:id', authenticate, validateTask, updateTaskHandler);
+
+/**
+ * @swagger
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Delete a task
+ *     description: Deletes an existing task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     responses:
+ *       204:
+ *         description: Task deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Task not found
+ *       500:
+ *         description: Server error
+ */
+router.delete('/:id', authenticate, deleteTaskHandler);
+
+export default router;

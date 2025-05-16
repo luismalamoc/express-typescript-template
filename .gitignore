@@ -1,0 +1,79 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Output of 'npm pack'
+*.tgz
+
+# Coverage directory used by Jest
+coverage/
+
+# Build files
+dist/
+build/
+lib/
+out/
+
+# Temporary files
+tmp/
+temp/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# VS Code files
+.vscode/
+.history/
+
+# MacOS files
+.DS_Store
+
+# Prisma files
+prisma/.env
+prisma/migrations/
+
+# Docker files
+docker-compose.override.yml
+.dockerignore
+
+# Tests output
+jest-coverage/
+test-results/
+
+# IDE specific files
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Express specific cache and generated files
+public/
+uploads/
+.cache/
