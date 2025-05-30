@@ -7,6 +7,9 @@ A well-structured Express.js API template built with TypeScript, featuring a cle
 ```
 express-typescript-template/
 ├── src/
+│   ├── client/                  # External API clients
+│   │   ├── jsonplaceholder.client.ts  # JSONPlaceholder API client
+│   │   └── jsonplaceholder.example.ts # Example usage of the client
 │   ├── config/                  # Application configuration
 │   │   ├── index.ts             # Configuration exports
 │   │   ├── typeorm.config.ts    # TypeORM database configuration
@@ -21,11 +24,13 @@ express-typescript-template/
 │   ├── routes/                  # API routes
 │   │   └── task.routes.ts       # Task routes with Swagger docs
 │   ├── schemas/                 # Validation schemas
-│   │   └── task.schema.ts       # Zod validation schemas for tasks
+│   │   ├── task.schema.ts       # Zod validation schemas for tasks
+│   │   └── jsonplaceholder.schema.ts  # Zod schemas for JSONPlaceholder API
 │   ├── services/                # Business logic
 │   │   └── task.service.ts      # Task service with DTOs for API contracts
 │   ├── types/                   # Type definitions
-│   │   └── task.types.ts        # Task-related type definitions and DTOs
+│   │   ├── task.types.ts        # Task-related type definitions and DTOs
+│   │   └── jsonplaceholder.types.ts  # JSONPlaceholder API type definitions
 │   ├── utils/                   # Utility functions
 │   │   └── errors.ts            # Custom error classes
 │   └── migrations/              # Database migrations
@@ -121,6 +126,7 @@ The server will be running at http://localhost:3000 with API documentation avail
 - **API Documentation**: Auto-generated with Swagger
 - **Authentication**: JWT-based authentication (template ready)
 - **Environment Configuration**: Using dotenv
+- **External API Client**: JSONPlaceholder API client implementation
 
 ## Adding a New Feature
 
@@ -133,6 +139,37 @@ To add a new feature:
 5. Create a controller in `src/controllers/`
 6. Define routes in `src/routes/`
 7. Register the routes in the main application
+
+## Using the JSONPlaceholder API Client
+
+The template includes a client for the JSONPlaceholder API (https://jsonplaceholder.typicode.com/):
+
+1. Import the client in your service or controller:
+   ```typescript
+   import { JsonPlaceholderClient } from '../client/jsonplaceholder.client';
+   ```
+
+2. Create an instance and use the methods:
+   ```typescript
+   const client = new JsonPlaceholderClient();
+   const posts = await client.getPosts();
+   const user = await client.getUserById(1);
+   ```
+
+3. Available methods include:
+   - `getPosts()` - Get all posts
+   - `getPostById(id)` - Get a post by ID
+   - `createPost(post)` - Create a new post
+   - `updatePost(id, post)` - Update a post
+   - `deletePost(id)` - Delete a post
+   - `getCommentsByPostId(postId)` - Get comments for a post
+   - `getUsers()` - Get all users
+   - `getUserById(id)` - Get a user by ID
+   - `getTodosByUserId(userId)` - Get todos for a user
+   - `getAlbumsByUserId(userId)` - Get albums for a user
+   - `getPhotosByAlbumId(albumId)` - Get photos for an album
+
+4. See `src/client/jsonplaceholder.example.ts` for usage examples
 
 ## API Documentation
 
