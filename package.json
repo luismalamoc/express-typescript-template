@@ -1,7 +1,7 @@
 {
   "name": "express-typescript-template",
   "version": "1.0.0",
-  "description": "Express TypeScript API Template with Modular Architecture",
+  "description": "Express TypeScript API Template with Traditional Layered Architecture",
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
@@ -21,9 +21,11 @@
     "typescript",
     "api",
     "template",
-    "modular"
+    "typeorm",
+    "zod",
+    "sqlite"
   ],
-  "author": "",
+  "author": "Luis Alamo <luismalamoc@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",

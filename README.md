@@ -1,6 +1,6 @@
 # Express TypeScript API Template
 
-A modular, well-structured Express.js API template built with TypeScript, featuring a clean architecture for building scalable backend applications.
+A well-structured Express.js API template built with TypeScript, featuring a clean architecture for building scalable backend applications with proper separation of concerns.
 
 ## Project Structure
 
@@ -8,26 +8,29 @@ A modular, well-structured Express.js API template built with TypeScript, featur
 express-typescript-template/
 ├── src/
 │   ├── config/                  # Application configuration
-│   │   └── index.ts             # Configuration variables
+│   │   ├── index.ts             # Configuration exports
+│   │   ├── typeorm.config.ts    # TypeORM database configuration
+│   │   └── logger.ts            # Logging configuration
+│   ├── controllers/             # Request handlers
+│   │   └── task.controller.ts   # Task controller with input validation
+│   ├── entities/                # TypeORM entities
+│   │   └── Task.ts              # Task entity definition
 │   ├── middlewares/             # Express middlewares
 │   │   ├── auth.middleware.ts   # Authentication middleware
-│   │   ├── error-handler.middleware.ts  # Global error handler
-│   │   └── health.middleware.ts # Health check endpoints
-│   ├── modules/                 # Feature modules
-│   │   └── tasks/               # Tasks module
-│   │       ├── controllers/     # Request handlers
-│   │       │   └── task.controller.ts
-│   │       ├── schemas/         # Validation schemas
-│   │       │   └── task.schema.ts
-│   │       ├── services/        # Business logic
-│   │       │   └── task.service.ts
-│   │       └── routes.ts        # Module routes with Swagger docs
+│   │   └── error-handler.middleware.ts  # Global error handler
+│   ├── routes/                  # API routes
+│   │   └── task.routes.ts       # Task routes with Swagger docs
+│   ├── schemas/                 # Validation schemas
+│   │   └── task.schema.ts       # Zod validation schemas for tasks
+│   ├── services/                # Business logic
+│   │   └── task.service.ts      # Task service with DTOs for API contracts
+│   ├── types/                   # Type definitions
+│   │   └── task.types.ts        # Task-related type definitions and DTOs
 │   ├── utils/                   # Utility functions
-│   │   ├── errors.ts           # Custom error classes
-│   │   └── logger.ts           # Logging utility
-│   ├── app.ts                   # Express app setup
-│   └── server.ts                # Server entry point
+│   │   └── errors.ts            # Custom error classes
+│   └── migrations/              # Database migrations
 ├── .env.example                 # Example environment variables
+├── .gitignore                   # Git ignore configuration
 ├── package.json                 # Project dependencies
 ├── tsconfig.json                # TypeScript configuration
 └── README.md                    # Project documentation
@@ -35,24 +38,40 @@ express-typescript-template/
 
 ## Architecture Overview
 
-This template follows a modular architecture where:
+This template follows a traditional layered architecture where:
 
-1. **Modules**: Each feature is organized into a separate module (e.g., tasks, users, auth)
-   - **Controllers**: Handle HTTP requests and responses
-   - **Services**: Contain business logic and data operations
-   - **Schemas**: Define validation rules for input data
-   - **Routes**: Define API endpoints with Swagger documentation
+1. **Controllers**: Handle HTTP requests and responses
+   - Input validation using Zod schemas
+   - Proper error handling
+   - Calling appropriate services
 
-2. **Middlewares**: Common request processing logic
+2. **Services**: Contain business logic and data operations
+   - Use DTOs for input/output to hide entity details
+   - Handle database operations through repositories
+   - Implement business rules
+
+3. **Entities**: Define database models
+   - TypeORM entity definitions
+   - Field validations and relationships
+
+4. **Schemas**: Define validation rules for input data
+   - Zod schemas for request validation
+   - Type inference for TypeScript safety
+
+5. **Middlewares**: Common request processing logic
    - Authentication
    - Error handling
-   - Health checks
+   - Request validation
 
-3. **Utils**: Shared utility functions
+6. **Routes**: Define API endpoints with Swagger documentation
+
+7. **Types**: Type definitions and DTOs
+   - Input/output data transfer objects
+   - Type safety throughout the application
+
+8. **Utils**: Shared utility functions
    - Custom error classes
-   - Logging
-
-4. **Config**: Application configuration
+   - Logging utilities
 
 ## Getting Started
 
@@ -92,23 +111,28 @@ The server will be running at http://localhost:3000 with API documentation avail
 
 ## Features
 
-- **TypeScript**: Type-safe code
-- **Modular Architecture**: Organized by feature
-- **Input Validation**: Using Zod schemas
+- **TypeScript**: Type-safe code with proper interfaces and types
+- **Traditional Layered Architecture**: Clear separation of concerns
+- **Input Validation**: Using Zod schemas for request validation
+- **Data Transfer Objects**: Proper separation between API contracts and database entities
+- **TypeORM**: Database ORM with SQLite support
 - **Error Handling**: Centralized error handling
-- **Logging**: Structured logging with Winston
+- **Logging**: Structured logging
 - **API Documentation**: Auto-generated with Swagger
-- **Health Checks**: Server health monitoring
-- **Authentication**: JWT-based authentication
+- **Authentication**: JWT-based authentication (template ready)
 - **Environment Configuration**: Using dotenv
 
-## Adding a New Module
+## Adding a New Feature
 
-To add a new feature module:
+To add a new feature:
 
-1. Create a new directory in `src/modules/`
-2. Add controllers, services, schemas, and routes
-3. Register the module's routes in `src/app.ts`
+1. Create a new entity in `src/entities/`
+2. Create validation schemas in `src/schemas/`
+3. Define types and DTOs in `src/types/`
+4. Implement the service in `src/services/`
+5. Create a controller in `src/controllers/`
+6. Define routes in `src/routes/`
+7. Register the routes in the main application
 
 ## API Documentation
 
@@ -130,4 +154,4 @@ The template includes JWT-based authentication:
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
