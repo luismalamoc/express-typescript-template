@@ -3,7 +3,7 @@ import { dataSource } from '../config';
 import { Task } from '../entities/Task';
 import { NotFoundError } from '../utils/errors';
 import { logger } from '../config/logger';
-import { CreateTaskDto, UpdateTaskDto } from '../types/task.types';
+import { CreateTaskDto, UpdateTaskDto, TaskResponseDto, TaskListResponseDto, TaskStatus } from '../types/task.types';
 import { TaskCreateInput, TaskUpdateInput } from '../schemas/task.schema';
 
 /**
@@ -15,20 +15,25 @@ export class TaskService {
   /**
    * Get all tasks
    */
-  static async getAllTasks(): Promise<Task[]> {
+  static async getAllTasks(): Promise<TaskListResponseDto> {
     logger.info('Getting all tasks');
     
-    return this.taskRepository.find({
+    const tasks = await this.taskRepository.find({
       order: {
         createdAt: 'DESC'
       }
     });
+    
+    return {
+      tasks: tasks.map(task => this.mapTaskToResponseDto(task)),
+      count: tasks.length
+    };
   }
   
   /**
    * Get a task by ID
    */
-  static async getTaskById(id: string): Promise<Task> {
+  static async getTaskById(id: string): Promise<TaskResponseDto> {
     logger.info(`Getting task with ID: ${id}`);
     
     const task = await this.taskRepository.findOne({ where: { id } });
@@ -37,13 +42,13 @@ export class TaskService {
       throw new NotFoundError(`Task with ID ${id} not found`);
     }
     
-    return task;
+    return this.mapTaskToResponseDto(task);
   }
   
   /**
    * Create a new task
    */
-  static async createTask(taskData: TaskCreateInput, userId: string): Promise<Task> {
+  static async createTask(taskData: TaskCreateInput, userId: string): Promise<TaskResponseDto> {
     logger.info(`Creating new task: ${taskData.title}`);
     
     const taskDto: CreateTaskDto = {
@@ -54,17 +59,23 @@ export class TaskService {
     };
     
     const newTask = this.taskRepository.create(taskDto);
+    const savedTask = await this.taskRepository.save(newTask);
     
-    return this.taskRepository.save(newTask);
+    return this.mapTaskToResponseDto(savedTask);
   }
   
   /**
    * Update an existing task
    */
-  static async updateTask(id: string, taskData: TaskUpdateInput): Promise<Task> {
+  static async updateTask(id: string, taskData: TaskUpdateInput): Promise<TaskResponseDto> {
     logger.info(`Updating task with ID: ${id}`);
     
-    const task = await this.getTaskById(id);
+    // Get the task entity directly from repository
+    const taskEntity = await this.taskRepository.findOne({ where: { id } });
+    
+    if (!taskEntity) {
+      throw new NotFoundError(`Task with ID ${id} not found`);
+    }
     
     // Create update DTO
     const updateDto: UpdateTaskDto = {};
@@ -75,9 +86,10 @@ export class TaskService {
     if (taskData.status !== undefined) updateDto.status = taskData.status;
     
     // Update task with DTO
-    Object.assign(task, updateDto);
+    Object.assign(taskEntity, updateDto);
     
-    return this.taskRepository.save(task);
+    const updatedTask = await this.taskRepository.save(taskEntity);
+    return this.mapTaskToResponseDto(updatedTask);
   }
   
   /**
@@ -86,8 +98,29 @@ export class TaskService {
   static async deleteTask(id: string): Promise<void> {
     logger.info(`Deleting task with ID: ${id}`);
     
-    const task = await this.getTaskById(id);
+    // Get the task entity directly from repository
+    const taskEntity = await this.taskRepository.findOne({ where: { id } });
     
-    await this.taskRepository.remove(task);
+    if (!taskEntity) {
+      throw new NotFoundError(`Task with ID ${id} not found`);
+    }
+    
+    await this.taskRepository.remove(taskEntity);
+  }
+  
+  /**
+   * Maps a Task entity to a TaskResponseDto
+   * This prevents exposing the entity directly to the API
+   */
+  private static mapTaskToResponseDto(task: Task): TaskResponseDto {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt
+    };
   }
 }

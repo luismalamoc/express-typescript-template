@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../config/logger';
 import { TaskService } from '../services/task.service';
+import { createTaskSchema, updateTaskSchema, TaskCreateInput, TaskUpdateInput } from '../schemas/task.schema';
+import { z } from 'zod';
 
 /**
  * Controller for getting all tasks
@@ -15,7 +17,7 @@ export const getAllTasksHandler = async (
     
     const tasks = await TaskService.getAllTasks();
     
-    res.status(200).json({ tasks, count: tasks.length });
+    res.status(200).json(tasks);
   } catch (error) {
     next(error);
   }
@@ -50,16 +52,23 @@ export const createTaskHandler = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const taskData = req.body;
+    // The validation middleware has already validated the request body,
+    // but we can explicitly parse it again for type safety
+    const taskData: TaskCreateInput = createTaskSchema.parse(req.body);
     logger.info(`Received request to create new task: ${taskData.title}`);
     
     // Get user ID from request (in a real app, this would come from authentication)
-    const userId = req.body.userId || req.user?.id || '1';
+    const userId = taskData.userId || req.user?.id || '1';
     
     const newTask = await TaskService.createTask(taskData, userId);
     
     res.status(201).json({ task: newTask });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      logger.error(`Task validation error: ${JSON.stringify(error.errors)}`);
+      res.status(400).json({ errors: error.errors });
+      return;
+    }
     next(error);
   }
 };
@@ -74,13 +83,20 @@ export const updateTaskHandler = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const taskData = req.body;
+    // The validation middleware has already validated the request body,
+    // but we can explicitly parse it again for type safety
+    const taskData: TaskUpdateInput = updateTaskSchema.parse(req.body);
     logger.info(`Received request to update task with ID: ${id}`);
     
     const updatedTask = await TaskService.updateTask(id, taskData);
     
     res.status(200).json({ task: updatedTask });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      logger.error(`Task validation error: ${JSON.stringify(error.errors)}`);
+      res.status(400).json({ errors: error.errors });
+      return;
+    }
     next(error);
   }
 };
@@ -94,7 +110,13 @@ export const deleteTaskHandler = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Validate the ID parameter (could use a separate schema for this)
     const { id } = req.params;
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid task ID' });
+      return;
+    }
+    
     logger.info(`Received request to delete task with ID: ${id}`);
     
     await TaskService.deleteTask(id);
