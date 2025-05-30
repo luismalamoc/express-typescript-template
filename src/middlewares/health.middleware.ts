@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { createTerminus } from '@godaddy/terminus';
 import { Server } from 'http';
-import { logger } from '../utils/logger';
+import { logger } from '../config/logger';
 
 /**
  * Configure health checks for the application

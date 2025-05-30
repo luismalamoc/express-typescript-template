@@ -2,8 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../utils/errors';
 import config from '../config';
-import { logger } from '../utils/logger';
-
+import { logger } from '../config/logger';
 // Extend Express Request type to include user property
 declare global {
   namespace Express {

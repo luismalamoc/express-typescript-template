@@ -5,9 +5,9 @@ import {
   createTaskHandler,
   updateTaskHandler,
   deleteTaskHandler
-} from './controllers/task.controller';
-import { authenticate } from '../../middlewares/auth.middleware';
-import { validateTask } from './schemas/task.schema';
+} from '../controllers/task.controller';
+import { authenticate } from '../middlewares/auth.middleware';
+import { validateCreateTask, validateUpdateTask } from '../schemas/task.schema';
 
 // Create router
 const router = Router();
@@ -17,25 +17,16 @@ const router = Router();
  * /tasks:
  *   get:
  *     summary: Get all tasks
- *     description: Retrieves all tasks, can be filtered by userId
+ *     description: Retrieves all tasks
  *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         description: Filter tasks by user ID
  *     responses:
  *       200:
  *         description: Tasks retrieved successfully
- *       401:
- *         description: Unauthorized
  *       500:
  *         description: Server error
  */
-router.get('/', authenticate, getAllTasksHandler);
+// Authentication middleware commented out for template project
+router.get('/', /* authenticate, */ getAllTasksHandler);
 
 /**
  * @swagger
@@ -44,8 +35,6 @@ router.get('/', authenticate, getAllTasksHandler);
  *     summary: Get a task by ID
  *     description: Retrieves a specific task by its ID
  *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -56,14 +45,13 @@ router.get('/', authenticate, getAllTasksHandler);
  *     responses:
  *       200:
  *         description: Task retrieved successfully
- *       401:
- *         description: Unauthorized
  *       404:
  *         description: Task not found
  *       500:
  *         description: Server error
  */
-router.get('/:id', authenticate, getTaskByIdHandler);
+// Authentication middleware commented out for template project
+router.get('/:id', /* authenticate, */ getTaskByIdHandler);
 
 /**
  * @swagger
@@ -72,8 +60,6 @@ router.get('/:id', authenticate, getTaskByIdHandler);
  *     summary: Create a new task
  *     description: Creates a new task
  *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -90,19 +76,16 @@ router.get('/:id', authenticate, getTaskByIdHandler);
  *               status:
  *                 type: string
  *                 enum: [pending, in-progress, completed]
- *               userId:
- *                 type: string
  *     responses:
  *       201:
  *         description: Task created successfully
  *       400:
  *         description: Validation error
- *       401:
- *         description: Unauthorized
  *       500:
  *         description: Server error
  */
-router.post('/', authenticate, validateTask, createTaskHandler);
+// Authentication middleware commented out for template project
+router.post('/', /* authenticate, */ validateCreateTask, createTaskHandler);
 
 /**
  * @swagger
@@ -111,8 +94,6 @@ router.post('/', authenticate, validateTask, createTaskHandler);
  *     summary: Update a task
  *     description: Updates an existing task
  *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -139,14 +120,13 @@ router.post('/', authenticate, validateTask, createTaskHandler);
  *         description: Task updated successfully
  *       400:
  *         description: Validation error
- *       401:
- *         description: Unauthorized
  *       404:
  *         description: Task not found
  *       500:
  *         description: Server error
  */
-router.put('/:id', authenticate, validateTask, updateTaskHandler);
+// Authentication middleware commented out for template project
+router.put('/:id', /* authenticate, */ validateUpdateTask, updateTaskHandler);
 
 /**
  * @swagger
@@ -155,8 +135,6 @@ router.put('/:id', authenticate, validateTask, updateTaskHandler);
  *     summary: Delete a task
  *     description: Deletes an existing task
  *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -167,13 +145,12 @@ router.put('/:id', authenticate, validateTask, updateTaskHandler);
  *     responses:
  *       204:
  *         description: Task deleted successfully
- *       401:
- *         description: Unauthorized
  *       404:
  *         description: Task not found
  *       500:
  *         description: Server error
  */
-router.delete('/:id', authenticate, deleteTaskHandler);
+// Authentication middleware commented out for template project
+router.delete('/:id', /* authenticate, */ deleteTaskHandler);
 
 export default router;
